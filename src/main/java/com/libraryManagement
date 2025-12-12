@@ -1,0 +1,424 @@
+
+package com.advancedprogramming1;
+
+import java.util.*;
+import java.time.Duration;
+import java.time.LocalDateTime;
+import java.time.temporal.ChronoUnit;
+import java.util.HashSet;
+import java.util.Scanner;
+import java.util.Set;
+
+class Member {
+    String name;
+    int age;
+    String phoneNo;
+    String memberId;
+    int dueFine;
+
+    Member(String name, int age, String phoneNo, String memberId) {
+        this.name = name;
+        this.age = age;
+        this.phoneNo = phoneNo;
+        this.memberId = phoneNo;
+        dueFine = 0;
+    }
+
+    public void issueBook(Vector<Book> bookArray, int bookIdInput, String titleInput, String memberId, Member member) {
+        for (Book book : bookArray) {
+            if (book.issuedTo.equals(memberId)) {
+                long secondsDifference = ChronoUnit.SECONDS.between(book.issueTime, LocalDateTime.now());
+                if (secondsDifference > 10) {
+                    member.dueFine = (int) (secondsDifference - 10) * 3;
+                }
+            }
+        }
+        if (member.dueFine != 0) {
+            System.out.println("You have a pending Due!");
+            System.out.println("---------------------------------");
+            return;
+        }
+        int flag = 0;
+        for (Book book : bookArray) {
+            if (book.bookId == bookIdInput && book.issuedTo.equals("")) {
+                flag = 1;
+                book.issuedTo = memberId;
+                book.issueTime = LocalDateTime.now();
+                System.out.println("Book Issued Successfully!");
+                System.out.println("---------------------------------");
+                break;
+            }
+        }
+        if (flag == 0) {
+            System.out.println("Book not available to issue !!");
+            System.out.println("---------------------------------");
+        }
+    }
+
+    public void availableBooks(Vector<Book> bookArray) {
+        int f = 0;
+        for (Book book : bookArray) {
+            if (book.issuedTo.equals("")) {
+                f = 1;
+                System.out.println("Book ID - " + book.bookId);
+                System.out.println("Book Name - " + book.title);
+                System.out.println("Book Author - " + book.author);
+                System.out.println(" ");
+            }
+        }
+        if (f == 0) {
+            System.out.println("No Books Available !!");
+        }
+        System.out.println("---------------------------------");
+    }
+
+    public void myBooks(Vector<Book> bookArray, String memId) {
+        int f = 0;
+        for (Book book : bookArray) {
+            if (book.issuedTo.equals(memId)) {
+                f = 1;
+                System.out.println("Book ID - " + book.bookId);
+                System.out.println("Book Name - " + book.title);
+                System.out.println("Book Author - " + book.author);
+                System.out.println(" ");
+            }
+        }
+        if (f == 0) {
+            System.out.println("No Books Available !!");
+        }
+        System.out.println("---------------------------------");
+    }
+
+    public void payFine(Member member) {
+        System.out.println("You had a total fine of Rs. " + member.dueFine + ". It has been paid successfully!");
+        member.dueFine = 0;
+        System.out.println("---------------------------------");
+    }
+
+    public void returnBook(Vector<Book> bookArray, int bookIdReturn, String memId, Member member) {
+        int f = 0;
+        for (Book book : bookArray) {
+            if (book.issuedTo.equals(memId) && bookIdReturn == book.bookId) {
+                f = 1;
+                LocalDateTime returnTime = LocalDateTime.now();
+                long secondsDifference = ChronoUnit.SECONDS.between(book.issueTime, returnTime);
+                long fine = 0;
+                if (secondsDifference > 10) {
+                    fine = (secondsDifference - 10) * 3;
+                }
+                int delay = (int) secondsDifference - 10;
+                System.out.println("Book ID: " + bookIdReturn + " successfully returned. " + fine
+                        + " Rupees has been charged for a delay of " + delay + "days.");
+
+                // System.out.println("---------------------------------");
+                member.dueFine = (int) fine;
+                book.issuedTo = "";
+            }
+        }
+
+        if (f == 0) {
+            System.out.println("No Books Available to return !!");
+        }
+        System.out.println("---------------------------------");
+
+    }
+}
+
+class Book {
+
+    String title;
+    String author;
+    int bookId;
+    String issuedTo;
+    LocalDateTime issueTime;
+
+    Book(String title, String author, int bookId) {
+        this.title = title;
+        this.author = author;
+        issuedTo = "";
+        issueTime = LocalDateTime.now();
+        this.bookId = bookId;
+    }
+}
+
+public class ap {
+
+    public static void main(String[] args) {
+
+        int bId = 0;
+        Set<String> phoneNumbers = new HashSet<>();
+        Scanner sc100 = new Scanner(System.in);
+        Vector<Book> bookArray = new Vector<>();
+        Vector<Member> memberArray = new Vector<>();
+
+        System.out.println("Library Portal Initialized...");
+        System.out.println("---------------------------------");
+        while (true) {
+            System.out.println("1. Enter as a librarian");
+            System.out.println("2. Enter as a Member");
+            System.out.println("3. Exit");
+            System.out.println("---------------------------------");
+            Scanner scanner = new Scanner(System.in);
+            int ip1 = scanner.nextInt();
+            System.out.println("---------------------------------");
+            if (ip1 == 1) {
+                while (true) {
+                    System.out.println("1. Register a Member");
+                    System.out.println("2. Remove a Member");
+                    System.out.println("3. Add a Book");
+                    System.out.println("4. Remove a Book");
+                    System.out.println("5. View all members along with their books and fines to be paid");
+                    System.out.println("6. View All Books");
+                    System.out.println("7. Back");
+                    System.out.println("---------------------------------");
+                    Scanner sc = new Scanner(System.in);
+                    int ip2 = sc.nextInt();
+                    System.out.println("---------------------------------");
+                    if (ip2 == 1) {
+                        System.out.println("Name: ");
+                        Scanner sc1 = new Scanner(System.in);
+                        String name = sc1.nextLine();
+
+                        System.out.println("Age: ");
+                        Scanner sc2 = new Scanner(System.in);
+                        int age = sc2.nextInt();
+
+                        System.out.println("Phone No.: ");
+                        String phoneNumber = sc100.nextLine();
+                        if (phoneNumbers.contains(phoneNumber)) {
+                            System.out.println("Error: Phone number " + phoneNumber + " is already provided.");
+                        } else {
+                            phoneNumbers.add(phoneNumber);
+                            Member m1 = new Member(name, age, phoneNumber, phoneNumber);
+                            memberArray.add(m1);
+                            System.out.println("Member Successfully Registered with " + phoneNumber + " !");
+                            System.out.println("---------------------------------");
+                        }
+                    } else if (ip2 == 2) {
+                        System.out.println("Enter Member Id: ");
+                        Scanner sc1 = new Scanner(System.in);
+                        String x = sc1.nextLine();
+                        System.out.println("---------------------------------");
+                        Vector<Member> tempMemberArray = new Vector<>();
+                        for (Member member : memberArray) {
+                            if (member.memberId != x) {
+                                tempMemberArray.add(member);
+                            }
+                        }
+                        if (memberArray.equals(tempMemberArray)) {
+                            System.out.println("Member Not Present!");
+                            System.out.println("---------------------------------");
+                        } else {
+                            System.out.println("Member Deleted Successfully!");
+                            System.out.println("---------------------------------");
+                        }
+                        memberArray = tempMemberArray;
+
+                    } else if (ip2 == 3) {
+                        System.out.println("Book Title: ");
+                        Scanner sc1 = new Scanner(System.in);
+                        String title = sc1.nextLine();
+
+                        System.out.println("Author: ");
+                        Scanner sc2 = new Scanner(System.in);
+                        String author = sc2.nextLine();
+
+                        System.out.println("Copies: ");
+                        Scanner sc3 = new Scanner(System.in);
+                        int copies = sc3.nextInt();
+
+                        for (int i = 0; i < copies; i++) {
+                            bId++;
+                            Book book = new Book(title, author, bId);
+                            bookArray.add(book);
+                        }
+                        System.out.println("Book Added Successfully!");
+                        System.out.println("---------------------------------");
+
+                    } else if (ip2 == 4) {
+                        System.out.println("Enter Book Id: ");
+                        Scanner sc1 = new Scanner(System.in);
+                        int x = sc1.nextInt();
+                        System.out.println("---------------------------------");
+                        Vector<Book> tempBookArray = new Vector<>();
+                        for (Book book : bookArray) {
+                            if (book.bookId != x) {
+                                tempBookArray.add(book);
+                            }
+                        }
+                        if (bookArray.equals(tempBookArray)) {
+                            System.out.println("Book Not Present!");
+                            System.out.println("---------------------------------");
+                        } else {
+                            System.out.println("Book Deleted Successfully!");
+                            System.out.println("---------------------------------");
+                        }
+                        bookArray = tempBookArray;
+
+                    } else if (ip2 == 5) {
+                        int i = 1;
+                        for (Member member : memberArray) {
+                            System.out.println("Member " + i);
+                            System.out.println("");
+                            System.out.println("Name : " + member.name);
+                            System.out.println("Age : " + member.age);
+                            System.out.println("Phone No. : " + member.phoneNo);
+                            for (Book book : bookArray) {
+                                if (book.issuedTo.equals(member.memberId)) {
+                                    long secondsDifference = ChronoUnit.SECONDS.between(book.issueTime,
+                                            LocalDateTime.now());
+                                    if (secondsDifference > 10) {
+                                        member.dueFine += (int) (secondsDifference - 10) * 3;
+                                    }
+                                }
+                            }
+                            System.out.println("Due Fine : " + member.dueFine);
+                            System.out.println("");
+                            System.out.println("Books :");
+                            System.out.println("");
+                            for (Book book : bookArray) {
+                                if (book.issuedTo.equals(member.memberId)) {
+                                    System.out.println("Book Title : " + book.title);
+                                    System.out.println("Author : " + book.author);
+                                    System.out.println("Book Id : " + book.bookId);
+                                    System.out.println("");
+                                }
+                            }
+                            i++;
+                        }
+                    } else if (ip2 == 6) {
+                        for (Book book : bookArray) {
+                            System.out.println("Book Title: " + book.title);
+                            System.out.println("Author: " + book.author);
+                            System.out.println("Book Id: " + book.bookId);
+                            System.out.println(" ");
+                        }
+                        System.out.println("---------------------------------");
+                    } else if (ip2 == 7) {
+                        break;
+                    }
+
+                }
+            } else if (ip1 == 2) {
+                System.out.println("Enter memberID/Phone no. ");
+                Scanner sc34 = new Scanner(System.in);
+                String memid = sc34.nextLine();
+                System.out.println("---------------------------------");
+
+                while (true) {
+
+                    System.out.println("1. List Available Books");
+                    System.out.println("2. List My Books");
+                    System.out.println("3. Issue book");
+                    System.out.println("4. Return book");
+                    System.out.println("5. Pay Fine");
+                    System.out.println("6. Back");
+                    System.out.println("---------------------------------");
+                    Scanner sc45 = new Scanner(System.in);
+                    int ip2 = sc45.nextInt();
+                    System.out.println("---------------------------------");
+                    if (ip2 == 1) {
+                        int flag1 = 0;
+                        for (Member member : memberArray) {
+                            if (member.memberId.equals(memid)) {
+                                flag1 = 1;
+                                member.availableBooks(bookArray);
+                            }
+                        }
+                        if (flag1 == 0) {
+                            System.out.println("Member not present !");
+                            break;
+                        }
+                    } else if (ip2 == 2) {
+                        int flag2 = 0;
+                        for (Member member : memberArray) {
+                            if (member.memberId.equals(memid)) {
+                                flag2 = 1;
+                                member.myBooks(bookArray, memid);
+                            }
+                        }
+                        if (flag2 == 0) {
+                            System.out.println("Member not present !");
+                            break;
+                        }
+                    } else if (ip2 == 3) {
+                        int flag1 = 0;
+                        for (Member member : memberArray) {
+                            if (member.memberId.equals(memid)) {
+                                flag1 = 1;
+                                member.availableBooks(bookArray);
+                            }
+                        }
+                        if (flag1 == 0) {
+                            System.out.println("Member not present !");
+                            break;
+                        }
+                        System.out.println("Enter bookID");
+                        Scanner sc57 = new Scanner(System.in);
+                        int bidddd = sc57.nextInt();
+                        System.out.println("---------------------------------");
+                        int flag3 = 0;
+                        for (Member member : memberArray) {
+                            if (member.memberId.equals(memid)) {
+                                flag3 = 1;
+                                member.issueBook(bookArray, bidddd, memid, memid, member);
+                            }
+                        }
+                        if (flag3 == 0) {
+                            System.out.println("Member not present !");
+                            break;
+                        }
+                    } else if (ip2 == 4) {
+                        int f1 = 0;
+                        for (Book book : bookArray) {
+                            if (book.issuedTo.equals(memid)) {
+                                f1 = 1;
+                                System.out.println("Book ID - " + book.bookId);
+                                System.out.println("Book Name - " + book.title);
+                                System.out.println("Book Author - " + book.author);
+                                System.out.println(" ");
+                            }
+                        }
+                        if (f1 == 0) {
+                            System.out.println("No Books borrowed !");
+                            break;
+                        }
+                        System.out.println("---------------------------------");
+                        System.out.println("Enter bookID");
+                        Scanner sc68 = new Scanner(System.in);
+                        int bidd = sc68.nextInt();
+                        System.out.println("---------------------------------");
+                        int flag4 = 0;
+                        for (Member member : memberArray) {
+                            if (member.memberId.equals(memid)) {
+                                flag4 = 1;
+                                member.returnBook(bookArray, bidd, memid, member);
+                            }
+                        }
+                        if (flag4 == 0) {
+                            System.out.println("Member not present !");
+                            break;
+                        }
+                    } else if (ip2 == 5) {
+                        int flag5 = 0;
+                        for (Member member : memberArray) {
+                            if (member.memberId.equals(memid)) {
+                                flag5 = 1;
+                                member.payFine(member);
+                            }
+                        }
+                        if (flag5 == 0) {
+                            System.out.println("Member not present !");
+                            break;
+                        }
+                    } else if (ip2 == 6) {
+                        break;
+                    }
+                }
+            } else {
+                break;
+            }
+        }
+
+    }
+}
