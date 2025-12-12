@@ -84,6 +84,3 @@ mvn exec:java -Dexec.mainClass="library.Main"
 - **Data Hiding & Validation**
 
 ---
-
-**Lab Assignment 01**.
-
